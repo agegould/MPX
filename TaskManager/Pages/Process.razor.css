@@ -1,0 +1,350 @@
+.task-manager {
+    max-width: 960px;
+    margin: 2rem auto;
+    font-family: system-ui, sans-serif;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a1a2e;
+}
+
+/* ── Add task ── */
+
+.add-task-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.task-input {
+    flex: 1;
+    padding: 0.6rem 0.9rem;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.task-input:focus {
+    border-color: #6366f1;
+}
+
+.btn-add {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.btn-add:hover:not(:disabled) { background: #4f46e5; }
+.btn-add:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── List meta ── */
+
+.task-count {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.4rem;
+}
+
+.empty-message {
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1rem;
+}
+
+/* ── Shared grid ──────────────────────────────────────────────
+   Columns: handle | checkbox | title | owner | status | date | expand | delete
+   ─────────────────────────────────────────────────────────── */
+
+.row-grid {
+    display: grid;
+    grid-template-columns: 28px 28px 1fr 170px 140px 130px 32px 32px;
+    align-items: center;
+    gap: 0 0.75rem;
+    padding: 0 0.9rem;
+}
+
+/* ── Header row ── */
+
+.task-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+}
+
+.list-header {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    user-select: none;
+}
+
+/* ── Task list ── */
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    border-bottom: 1px solid #f3f4f6;
+    cursor: default;
+    transition: background 0.12s, opacity 0.15s;
+    user-select: none;
+}
+
+.task-item:last-child { border-bottom: none; }
+
+.task-item:hover { background: #fafafa; }
+
+.task-item.dragging { opacity: 0.4; }
+
+.task-item.drag-over { background: #eef2ff; box-shadow: inset 0 0 0 2px #6366f1; }
+
+.task-item.expanded { background: #fafaff; }
+
+/* ── Task header row ── */
+
+.task-header {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+    min-height: 52px;
+}
+
+.drag-handle {
+    color: #c4c9d4;
+    cursor: grab;
+    font-size: 1rem;
+    letter-spacing: -2px;
+    line-height: 1;
+    justify-self: center;
+}
+
+.drag-handle:active { cursor: grabbing; }
+
+.task-header input[type="checkbox"] {
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: #6366f1;
+    cursor: pointer;
+    justify-self: center;
+}
+
+.task-title {
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s;
+}
+
+.task-title.completed {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+/* ── Owner cell ── */
+
+.owner-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.avatar-empty {
+    background: #e5e7eb;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.owner-name {
+    font-size: 0.88rem;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* ── Status cell ── */
+
+.status-cell { display: flex; align-items: center; }
+
+.status-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.status-created       { background: #f3f4f6; color: #6b7280; }
+.status-ready         { background: #fef9c3; color: #92400e; }
+.status-inprogress    { background: #dbeafe; color: #1d4ed8; }
+.status-complete      { background: #dcfce7; color: #15803d; }
+.status-failed        { background: #fee2e2; color: #b91c1c; }
+.status-notapplicable { background: #f3f4f6; color: #9ca3af; }
+.status-rejected      { background: #fce7f3; color: #9d174d; }
+
+/* ── Date cell ── */
+
+.date-cell {
+    font-size: 0.88rem;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.cell-empty { color: #d1d5db; }
+
+/* ── Expand / delete buttons ── */
+
+.btn-expand {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-expand:hover { color: #6366f1; background: #eef2ff; }
+
+.chevron {
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.chevron.up { transform: rotate(180deg); }
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: #d1d5db;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-delete:hover { color: #ef4444; background: #fef2f2; }
+
+/* ── Expanded detail panel ── */
+
+.task-details {
+    padding: 0.85rem 1rem 1rem calc(28px + 28px + 0.9rem + 1.5rem);
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    user-select: text;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1.5rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.field-full { grid-column: 1 / -1; }
+
+.field > label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: default;
+}
+
+.field input[type="text"],
+.field input[type="date"],
+.field select,
+.field textarea {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    background: #fafafa;
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: #6366f1;
+    background: white;
+}
+
+.field textarea { resize: vertical; }
+
+/* ── Footer actions ── */
+
+.btn-clear-completed {
+    margin-top: 1rem;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+    background: none;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-clear-completed:hover { background: #f3f4f6; color: #374151; }

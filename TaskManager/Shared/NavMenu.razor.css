@@ -1,0 +1,180 @@
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.top-row {
+    height: 3.5rem;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.navbar-brand {
+    font-size: 1.1rem;
+}
+
+.oi {
+    width: 2rem;
+    font-size: 1.1rem;
+    vertical-align: text-top;
+    top: -2px;
+}
+
+.nav-item {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item ::deep a {
+        color: #d7d7d7;
+        border-radius: 4px;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+    }
+
+.nav-item ::deep a.active {
+    background-color: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.nav-item ::deep a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* ── Section header ── */
+
+.nav-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem 0.25rem 1rem;
+}
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+}
+
+.btn-new-process {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.2rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-new-process:hover {
+    color: white;
+    background: rgba(255,255,255,0.15);
+}
+
+/* ── Process items ── */
+
+.process-item {
+    display: flex;
+    align-items: center;
+    padding-bottom: 0 !important;
+    position: relative;
+}
+
+.process-item ::deep a {
+    flex: 1;
+    min-width: 0;
+}
+
+.process-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+}
+
+.proc-actions {
+    display: none;
+    gap: 2px;
+    flex-shrink: 0;
+    padding-right: 0.25rem;
+}
+
+.process-item:hover .proc-actions {
+    display: flex;
+}
+
+.btn-proc-action {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.95rem;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-proc-action:hover {
+    color: white;
+    background: rgba(255,255,255,0.15);
+}
+
+.btn-proc-delete:hover {
+    color: #fca5a5;
+    background: rgba(239,68,68,0.2);
+}
+
+/* ── Inline name input (rename / new) ── */
+
+.process-name-input {
+    width: 100%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    color: white;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+    outline: none;
+    margin: 0.25rem 0;
+}
+
+.process-name-input::placeholder {
+    color: rgba(255,255,255,0.35);
+}
+
+.process-name-input:focus {
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.18);
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+
+    .nav-scrollable {
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+}

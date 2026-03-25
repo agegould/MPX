@@ -1,0 +1,12 @@
+@page "/"
+@inject ProcessService ProcessService
+@inject NavigationManager NavManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        var first = ProcessService.Processes.FirstOrDefault();
+        if (first is not null)
+            NavManager.NavigateTo($"/process/{first.Id}", replace: true);
+    }
+}

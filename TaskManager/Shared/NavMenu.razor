@@ -1,0 +1,120 @@
+@inject ProcessService ProcessService
+@inject NavigationManager NavManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Managed Processes</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+
+        <div class="nav-section-header" @onclick:stopPropagation="true">
+            <span class="section-label">Processes</span>
+            <button class="btn-new-process" @onclick="ShowNewInput" title="New process">+</button>
+        </div>
+
+        @foreach (var proc in ProcessService.Processes)
+        {
+            <div class="nav-item px-3 process-item" @onclick:stopPropagation="true">
+                @if (renamingId == proc.Id)
+                {
+                    <input class="process-name-input"
+                           value="@renameText"
+                           @oninput="e => renameText = e.Value?.ToString() ?? string.Empty"
+                           @onkeydown="e => HandleRenameKey(e, proc)"
+                           @onblur="() => CommitRename(proc)"
+                           @onclick:stopPropagation="true" />
+                }
+                else
+                {
+                    <NavLink class="nav-link" href="@($"/process/{proc.Id}")" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-layers" aria-hidden="true"></span>
+                        <span class="process-name">@proc.Name</span>
+                    </NavLink>
+                    <div class="proc-actions">
+                        <button class="btn-proc-action" @onclick="() => StartRename(proc)" title="Rename">&#9998;</button>
+                        <button class="btn-proc-action btn-proc-delete" @onclick="() => DeleteProcess(proc)" title="Delete">&#215;</button>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (showNewInput)
+        {
+            <div class="nav-item px-3" @onclick:stopPropagation="true">
+                <input class="process-name-input"
+                       @bind="newProcessName"
+                       @bind:event="oninput"
+                       @onkeydown="HandleNewKey"
+                       @onblur="CommitNew"
+                       placeholder="Process name..." />
+            </div>
+        }
+
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    private bool showNewInput = false;
+    private string newProcessName = "";
+    private Guid? renamingId;
+    private string renameText = "";
+
+    private void ShowNewInput()
+    {
+        showNewInput = true;
+        newProcessName = "";
+    }
+
+    private void CommitNew()
+    {
+        if (!string.IsNullOrWhiteSpace(newProcessName))
+        {
+            var proc = ProcessService.AddProcess(newProcessName);
+            NavManager.NavigateTo($"/process/{proc.Id}");
+        }
+        showNewInput = false;
+        newProcessName = "";
+    }
+
+    private void HandleNewKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") CommitNew();
+        else if (e.Key == "Escape") { showNewInput = false; newProcessName = ""; }
+    }
+
+    private void StartRename(ManagedProcess proc)
+    {
+        renamingId = proc.Id;
+        renameText = proc.Name;
+    }
+
+    private void CommitRename(ManagedProcess proc)
+    {
+        if (!string.IsNullOrWhiteSpace(renameText))
+            proc.Name = renameText.Trim();
+        renamingId = null;
+    }
+
+    private void HandleRenameKey(KeyboardEventArgs e, ManagedProcess proc)
+    {
+        if (e.Key == "Enter") CommitRename(proc);
+        else if (e.Key == "Escape") renamingId = null;
+    }
+
+    private void DeleteProcess(ManagedProcess proc)
+    {
+        ProcessService.DeleteProcess(proc.Id);
+        var first = ProcessService.Processes.FirstOrDefault();
+        NavManager.NavigateTo(first is not null ? $"/process/{first.Id}" : "/");
+    }
+}

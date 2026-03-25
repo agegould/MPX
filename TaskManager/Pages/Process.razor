@@ -1,0 +1,302 @@
+@page "/process/{ProcessId}"
+@inject ProcessService ProcessService
+
+@if (process is null)
+{
+    <p class="empty-message" style="margin-top:2rem">Process not found.</p>
+}
+else
+{
+    <PageTitle>@process.Name</PageTitle>
+
+    <div class="task-manager">
+        <h1>@process.Name</h1>
+
+        <div class="add-task-form">
+            <input @bind="newTaskTitle"
+                   @bind:event="oninput"
+                   @onkeydown="HandleKeyDown"
+                   placeholder="Enter a new task..."
+                   class="task-input" />
+            <button @onclick="AddTask" disabled="@string.IsNullOrWhiteSpace(newTaskTitle)" class="btn-add">
+                Add Task
+            </button>
+        </div>
+
+        @if (process.Tasks.Count == 0)
+        {
+            <p class="empty-message">No tasks yet. Add one above!</p>
+        }
+        else
+        {
+            <p class="task-count">@process.Tasks.Count task@(process.Tasks.Count == 1 ? "" : "s") &mdash; drag to reorder</p>
+
+            <div class="task-table">
+
+                <div class="row-grid list-header">
+                    <span></span>
+                    <span></span>
+                    <span>Title</span>
+                    <span>Owner</span>
+                    <span>Status</span>
+                    <span>Date Completed</span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <ul class="task-list">
+                    @for (int i = 0; i < process.Tasks.Count; i++)
+                    {
+                        var index = i;
+                        var task = process.Tasks[i];
+                        var isExpanded = expandedTasks.Contains(task.Id);
+
+                        <li class="task-item @(dragOverIndex == index ? "drag-over" : "") @(draggedIndex == index ? "dragging" : "") @(isExpanded ? "expanded" : "")"
+                            draggable="true"
+                            @ondragstart="() => OnDragStart(index)"
+                            @ondragover:preventDefault="true"
+                            @ondragover="() => OnDragOver(index)"
+                            @ondrop="() => OnDrop(index)"
+                            @ondragend="OnDragEnd">
+
+                            <div class="row-grid task-header">
+
+                                <span class="drag-handle" title="Drag to reorder">&#8942;&#8942;</span>
+
+                                <input type="checkbox"
+                                       id="task-@task.Id"
+                                       checked="@task.IsCompleted"
+                                       @onchange="() => ToggleTask(task)" />
+
+                                <label for="task-@task.Id" class="task-title @(task.IsCompleted ? "completed" : "")">
+                                    @task.Title
+                                </label>
+
+                                <div class="owner-cell">
+                                    @if (!string.IsNullOrWhiteSpace(task.Owner))
+                                    {
+                                        <div class="avatar" style="background:@GetAvatarColor(task.Owner)"
+                                             title="@task.Owner">
+                                            @GetAvatarInitials(task.Owner)
+                                        </div>
+                                        <span class="owner-name">@task.Owner</span>
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar avatar-empty" title="Unassigned">—</div>
+                                    }
+                                </div>
+
+                                <div class="status-cell">
+                                    <span class="status-badge status-@task.Status.ToString().ToLower()">
+                                        @ProcessService.StatusLabel(task.Status)
+                                    </span>
+                                </div>
+
+                                <div class="date-cell">
+                                    @if (task.DateCompleted.HasValue)
+                                    {
+                                        <span>@task.DateCompleted.Value.ToString("MMM d, yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="cell-empty">—</span>
+                                    }
+                                </div>
+
+                                <button class="btn-expand" @onclick="() => ToggleExpand(task.Id)"
+                                        title="@(isExpanded ? "Collapse" : "Expand details")">
+                                    <span class="chevron @(isExpanded ? "up" : "")">&#8964;</span>
+                                </button>
+
+                                <button class="btn-delete" @onclick="() => DeleteTask(task)" title="Delete task">
+                                    &times;
+                                </button>
+                            </div>
+
+                            @if (isExpanded)
+                            {
+                                <div class="task-details" draggable="false"
+                                     @ondragstart:stopPropagation="true">
+                                    <div class="details-grid">
+
+                                        <div class="field field-full">
+                                            <label>Details</label>
+                                            <textarea @bind="task.Details" rows="3"
+                                                      placeholder="Add details..."></textarea>
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Owner</label>
+                                            <input type="text" @bind="task.Owner" placeholder="Assigned to..." />
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Status</label>
+                                            <select @bind="task.Status">
+                                                @foreach (var s in Enum.GetValues<TaskItemStatus>())
+                                                {
+                                                    <option value="@s">@ProcessService.StatusLabel(s)</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Date Completed</label>
+                                            <input type="date" @bind="task.DateCompleted" />
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Condition</label>
+                                            <select @bind="task.Condition">
+                                                <option value="">— Select —</option>
+                                                <option>Good</option>
+                                                <option>Fair</option>
+                                                <option>Poor</option>
+                                                <option>Critical</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Automation Key</label>
+                                            <input type="text" @bind="task.AutomationKey"
+                                                   placeholder="e.g. TASK-001" />
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Group</label>
+                                            <input type="text" @bind="task.Group"
+                                                   placeholder="Group name..." />
+                                        </div>
+
+                                        <div class="field">
+                                            <label>Type</label>
+                                            <select @bind="task.Type">
+                                                <option value="">— Select —</option>
+                                                <option>Task</option>
+                                                <option>Bug</option>
+                                                <option>Feature</option>
+                                                <option>Improvement</option>
+                                                <option>Research</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            @if (process.Tasks.Any(t => t.IsCompleted))
+            {
+                <button class="btn-clear-completed" @onclick="ClearCompleted">
+                    Clear completed (@process.Tasks.Count(t => t.IsCompleted))
+                </button>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string ProcessId { get; set; } = "";
+
+    private ManagedProcess? process;
+    private HashSet<Guid> expandedTasks = new();
+    private string newTaskTitle = "";
+    private int? draggedIndex;
+    private int? dragOverIndex;
+
+    protected override void OnParametersSet()
+    {
+        if (Guid.TryParse(ProcessId, out var id))
+            process = ProcessService.GetProcess(id);
+        else
+            process = null;
+
+        expandedTasks.Clear();
+        newTaskTitle = "";
+        draggedIndex = null;
+        dragOverIndex = null;
+    }
+
+    private static readonly string[] AvatarColors =
+        ["#6366f1", "#8b5cf6", "#ec4899", "#14b8a6", "#f59e0b", "#ef4444", "#22c55e", "#3b82f6", "#f97316", "#06b6d4"];
+
+    private static string GetAvatarColor(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "#d1d5db";
+        var hash = Math.Abs(name.GetHashCode());
+        return AvatarColors[hash % AvatarColors.Length];
+    }
+
+    private static string GetAvatarInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "";
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2
+            ? $"{char.ToUpper(parts[0][0])}{char.ToUpper(parts[^1][0])}"
+            : char.ToUpper(parts[0][0]).ToString();
+    }
+
+    private void AddTask()
+    {
+        if (process is not null && !string.IsNullOrWhiteSpace(newTaskTitle))
+        {
+            process.Tasks.Add(new TaskItem { Title = newTaskTitle.Trim() });
+            newTaskTitle = "";
+        }
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddTask();
+    }
+
+    private void DeleteTask(TaskItem task)
+    {
+        expandedTasks.Remove(task.Id);
+        process?.Tasks.Remove(task);
+    }
+
+    private void ToggleTask(TaskItem task) => task.IsCompleted = !task.IsCompleted;
+
+    private void ClearCompleted() => process?.Tasks.RemoveAll(t => t.IsCompleted);
+
+    private void ToggleExpand(Guid id)
+    {
+        if (!expandedTasks.Remove(id))
+            expandedTasks.Add(id);
+    }
+
+    private void OnDragStart(int index)
+    {
+        draggedIndex = index;
+        dragOverIndex = null;
+    }
+
+    private void OnDragOver(int index)
+    {
+        if (draggedIndex.HasValue && draggedIndex.Value != index)
+            dragOverIndex = index;
+    }
+
+    private void OnDrop(int dropIndex)
+    {
+        if (process is null || !draggedIndex.HasValue || draggedIndex.Value == dropIndex) return;
+
+        var item = process.Tasks[draggedIndex.Value];
+        process.Tasks.RemoveAt(draggedIndex.Value);
+        process.Tasks.Insert(dropIndex, item);
+
+        draggedIndex = null;
+        dragOverIndex = null;
+    }
+
+    private void OnDragEnd()
+    {
+        draggedIndex = null;
+        dragOverIndex = null;
+    }
+}
