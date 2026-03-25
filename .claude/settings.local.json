@@ -8,7 +8,17 @@
       "Bash(dotnet --list-sdks)",
       "Bash(dotnet nuget:*)",
       "Bash(find C:DevProjectsBlazorApp -type f -not -path */bin/* -not -path */obj/* -not -path */.git/*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(tasklist /fi \"imagename eq TaskManager.exe\")",
+      "Bash(tasklist /fi \"imagename eq dotnet.exe\")",
+      "Bash(powershell -Command \"Get-Process | Where-Object { \\\\$_.Name -match 'TaskManager|dotnet' } | Select-Object Id, Name, Path\")",
+      "Bash(powershell -Command \"Move-Item 'C:\\\\DevProjects\\\\BlazorApp\\\\TaskManager' 'C:\\\\DevProjects\\\\BlazorApp\\\\src\\\\TaskManager'\")",
+      "Bash(powershell -Command \"Get-Process | Where-Object { \\\\$_.Modules.FileName -like '*BlazorApp*' } | Select-Object Id, Name\" 2>&1)",
+      "Bash(powershell -Command \"Get-Process | Where-Object { \\\\$_.Name -match 'devenv|rider|code|msbuild|vbcscompiler|dotnet' } | Select-Object Id, Name\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(e[''''RelativePath'''']\\) for e in d[''''Endpoints''''] if ''''styles'''' in e[''''RelativePath''''].lower\\(\\)]\")",
+      "Bash(python3:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(git add:*)"
     ]
   }
 }

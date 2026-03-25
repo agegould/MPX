@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Run the app (HTTP on port 5226)
-cd TaskManager && dotnet run
+cd src/ManagedProcessManager && dotnet run
 
 # Run with HTTPS (port 7199)
-cd TaskManager && dotnet run --launch-profile https
+cd src/ManagedProcessManager && dotnet run --launch-profile https
 
 # Build
-cd TaskManager && dotnet build
+cd src/ManagedProcessManager && dotnet build
 ```
 
 ## Architecture
@@ -27,6 +27,6 @@ The app is a task manager — all business logic lives in one component: `Pages/
 
 **Routing/layout chain:** `App.razor` → `Routes.razor` → `MainLayout.razor` (sidebar + content) → page components under `Pages/`
 
-**`_Imports.razor`** pulls in `TaskManager` and `TaskManager.Shared` namespaces globally, so those don't need explicit `@using` in individual components.
+**`_Imports.razor`** pulls in `ManagedProcessManager` and `ManagedProcessManager.Shared` namespaces globally, so those don't need explicit `@using` in individual components.
 
 **wwwroot** uses Bootstrap and Open Iconic (icon font) for styling — no npm/node build step.
